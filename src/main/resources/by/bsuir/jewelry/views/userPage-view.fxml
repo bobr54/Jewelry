@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" style="-fx-background-color: #cadbed;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsuir.jewelry.controllers.UserPageController">
+   <children>
+      <Text layoutX="25.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Jewelry App">
+         <font>
+            <Font name="Arial" size="39.0" />
+         </font>
+      </Text>
+      <Button fx:id="exitBtn" layoutX="523.0" layoutY="20.0" mnemonicParsing="false" onMouseClicked="#exitBtn" prefHeight="34.0" prefWidth="162.0" text="Выйти" />
+      <HBox layoutY="69.0" prefHeight="430.0" prefWidth="700.0" style="-fx-background-color: #f8efdc;">
+         <children>
+            <VBox prefHeight="430.0" prefWidth="207.0">
+               <children>
+                  <AnchorPane prefHeight="26.0" prefWidth="140.0" />
+                  <TableView fx:id="myJewelryTable" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn prefWidth="139.1999877691269" text="Мои ожерелья" />
+                    </columns>
+                  </TableView>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="deleteBtn" disable="true" layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#deleteBtn" prefHeight="26.0" prefWidth="94.0" text="Удалить" />
+                     </children>
+                  </AnchorPane>
+               </children>
+            </VBox>
+            <VBox prefHeight="430.0" prefWidth="461.0">
+               <children>
+                  <GridPane prefHeight="430.0" prefWidth="403.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="30.80000000000001" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="386.7999572753906" minWidth="10.0" prefWidth="358.9999572753906" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="22.200042724609375" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints maxHeight="26.0" minHeight="7.999975585937499" prefHeight="7.999975585937499" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="283.999951171875" minHeight="10.0" prefHeight="100.60002441406249" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="322.19999389648433" minHeight="10.0" prefHeight="282.39995117187493" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="89.59998168945313" minHeight="10.0" prefHeight="22.400048828125023" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <ScrollPane prefHeight="269.0" prefWidth="354.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="262.0" prefWidth="369.0">
+                                 <children>
+                                    <TableView fx:id="gemTable" prefHeight="261.0" prefWidth="378.0">
+                                      <columns>
+                                        <TableColumn fx:id="idColumn" prefWidth="44.8000470995903" text="id" />
+                                        <TableColumn fx:id="weightColumn" prefWidth="96.0" text="Вес, карат" />
+                                          <TableColumn fx:id="priceColumn" prefWidth="109.60005187988281" text="Цена, руб" />
+                                          <TableColumn fx:id="clarityColumn" prefWidth="135.99998474121094" text="Прозрачность, %" />
+                                      </columns>
+                                    </TableView>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </ScrollPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <AnchorPane layoutX="-5.0" prefHeight="82.0" prefWidth="226.0">
+                                 <children>
+                                    <Text layoutX="70.0" layoutY="18.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Сортировка" />
+                                    <ChoiceBox fx:id="sortChoice" layoutY="48.0" prefHeight="26.0" prefWidth="107.0" />
+                                    <Button fx:id="ascendingBtn" layoutX="113.0" layoutY="35.0" mnemonicParsing="false" onMouseClicked="#ascendingBtn" prefHeight="26.0" prefWidth="107.0" text="По возрастанию" />
+                                    <Button fx:id="decendingBtn" layoutX="113.0" layoutY="69.0" mnemonicParsing="false" onMouseClicked="#decendingBtn" prefHeight="26.0" prefWidth="107.0" text="По убыванию" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="214.0" layoutY="7.0" prefHeight="89.0" prefWidth="162.0">
+                                 <children>
+                                    <TextField fx:id="maxFilterField" layoutX="37.0" layoutY="62.0" prefHeight="26.0" prefWidth="68.0" />
+                                    <Button fx:id="filterBtn" layoutX="112.0" layoutY="44.0" mnemonicParsing="false" onMouseClicked="#filterBtn" text="Найти" />
+                                    <TextField fx:id="minFilterField" layoutX="37.0" layoutY="31.0" prefHeight="26.0" prefWidth="68.0" />
+                                    <Text layoutX="14.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="От" />
+                                    <Text layoutX="13.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="До" />
+                                    <Text layoutX="7.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Фильтрация по прозрачности">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Text>
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                           <children>
+                              <Text layoutX="251.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Стоимость: " />
+                              <Text fx:id="totalCostTxt" layoutX="323.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0руб" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </GridPane>
+               </children>
+            </VBox>
+            <VBox prefHeight="430.0" prefWidth="218.0">
+               <children>
+                  <AnchorPane prefHeight="62.0" prefWidth="157.0" />
+                  <AnchorPane prefHeight="164.0" prefWidth="157.0">
+                     <children>
+                        <Text layoutX="9.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Создание ожерелья">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font></Text>
+                        <TextField fx:id="weightField" layoutX="23.0" layoutY="87.0" prefHeight="26.0" prefWidth="74.0" />
+                        <Label layoutX="23.0" layoutY="69.0" text="Введите вес, карат" />
+                        <Button fx:id="createBtn" layoutX="48.0" layoutY="126.0" mnemonicParsing="false" onMouseClicked="#createBtn" text="Создать" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <Text fx:id="noJewelryText" fill="RED" layoutX="17.0" layoutY="22.0" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Невозможно создать ожерелье с таким весом" textAlignment="CENTER" wrappingWidth="125.59995117187486">
+                           <font>
+                              <Font name="System Italic" size="14.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
