@@ -1,5 +1,6 @@
 package by.bsuir.jewelry.dao;
 
+import by.bsuir.jewelry.models.Gem;
 import by.bsuir.jewelry.models.Necklace;
 import by.bsuir.jewelry.models.User;
 import by.bsuir.jewelry.util.EntityManager;
@@ -31,5 +32,7 @@ public class NecklaceDao {
         return EntityManager.find(Necklace.class, id, "id");
     }
 
-
+    public List<Necklace> getAllNecklace() {
+        return (List<Necklace>) HibernateUtil.getSessionFactory().openSession().createQuery("From Necklace").list();
+    }
 }

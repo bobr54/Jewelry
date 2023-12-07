@@ -20,4 +20,7 @@ public class NecklaceService {
         necklaceDao.addNecklace(necklace);
     }
     //в этом методе надо будет тестировать deleteNecklace;
+    public  List<Necklace> getAllNecklace(){
+        return necklaceDao.getAllNecklace();
+    }
 }

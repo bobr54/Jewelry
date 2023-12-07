@@ -93,7 +93,7 @@
                               <AnchorPane layoutX="214.0" layoutY="7.0" prefHeight="89.0" prefWidth="162.0">
                                  <children>
                                     <TextField fx:id="maxFilterField" layoutX="37.0" layoutY="62.0" prefHeight="26.0" prefWidth="68.0" />
-                                    <Button fx:id="filterBtn" layoutX="112.0" layoutY="44.0" mnemonicParsing="false" onMouseClicked="#filterBtn" text="Найти" />
+                                    <Button fx:id="filterBtn" layoutX="114.0" layoutY="44.0" mnemonicParsing="false" onMouseClicked="#filterBtn" text="Найти" />
                                     <TextField fx:id="minFilterField" layoutX="37.0" layoutY="31.0" prefHeight="26.0" prefWidth="68.0" />
                                     <Text layoutX="14.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="От" />
                                     <Text layoutX="13.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="До" />
@@ -105,7 +105,10 @@
                               </AnchorPane>
                            </children>
                         </AnchorPane>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                           <children>
+                              <Button fx:id="refreshBtn" layoutX="136.0" layoutY="5.0" mnemonicParsing="false" onMouseClicked="#refreshBtn" text="Сброс фильтров" />
+                           </children></AnchorPane>
                      </children>
                   </GridPane>
                </children>

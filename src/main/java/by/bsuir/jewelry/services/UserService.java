@@ -22,4 +22,9 @@ public class UserService {
     public String getRegistrationRole(){
         return userDao.hasAnyUser() ? "user" : "admin";
     }
+
+    public User getUserById(Long id) {
+        return userDao.findUserById(id);
+    }
+
 }

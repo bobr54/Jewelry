@@ -23,7 +23,7 @@ public class UserDao {
         return EntityManager.deleteEntity(id, User.class);
     }
 
-    public User findUserById(int id) {
+    public User findUserById(Long id) {
         return EntityManager.find(User.class, id, "id");
     }
 

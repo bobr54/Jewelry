@@ -55,13 +55,20 @@ public class LoginController {
         if (authResult.isAuthenticated()) {
             try {
                 FXMLLoader loader;
-                if(authResult.getRole().equals("admin"))
+                if(authResult.getRole().equals("admin")) {
                     loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/adminPage-view.fxml"));
-                else
+                    Stage primaryStage = (Stage) regBtn.getScene().getWindow();
+                    primaryStage.setScene(new Scene(loader.load(), 700, 500));
+                    primaryStage.show();
+                }
+                else {
                     loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/userPage-view.fxml"));
-                Stage primaryStage = (Stage) regBtn.getScene().getWindow();
-                primaryStage.setScene(new Scene(loader.load(), 700, 500));
-                primaryStage.show();
+                    Stage primaryStage = (Stage) regBtn.getScene().getWindow();
+                    primaryStage.setScene(new Scene(loader.load(), 700, 500));
+                    UserPageController controller = loader.getController();
+                    controller.setId(authResult.getUserId());
+                    primaryStage.show();
+                }
 
             } catch (IOException e) {
                 throw new RuntimeException(e);

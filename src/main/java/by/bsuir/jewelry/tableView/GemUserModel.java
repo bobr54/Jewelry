@@ -3,18 +3,20 @@ package by.bsuir.jewelry.tableView;
 import by.bsuir.jewelry.models.Gem;
 import javafx.beans.property.*;
 
-public class GemModel {
+public class GemUserModel {
     private final LongProperty id;
     private final DoubleProperty price;
     private final DoubleProperty weight;
     private final DoubleProperty clarity;
 
+    private final IntegerProperty quantity;
 
-    public GemModel(Gem gem) {
+    public GemUserModel(Gem gem, int quantity) {
         this.id = new SimpleLongProperty(gem.getId());
         this.price = new SimpleDoubleProperty(gem.getPrice());
         this.weight = new SimpleDoubleProperty(gem.getWeight());
         this.clarity = new SimpleDoubleProperty(gem.getClarity());
+        this.quantity = new SimpleIntegerProperty(quantity);
     }
 
     public double getClarity() {
@@ -53,4 +55,13 @@ public class GemModel {
         return weight;
     }
 
+    public IntegerProperty quantityProperty() {
+        return quantity;
+    }
+
+    public int getQuantity() {
+        return quantity.get();
+    }
+
 }
+

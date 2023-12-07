@@ -31,12 +31,12 @@
                   <AnchorPane prefHeight="26.0" prefWidth="140.0" />
                   <TableView fx:id="myJewelryTable" prefHeight="200.0" prefWidth="200.0">
                     <columns>
-                      <TableColumn prefWidth="139.1999877691269" text="Мои ожерелья" />
+                      <TableColumn fx:id="idNecklaceColumn" prefWidth="139.1999877691269" text="Мои ожерелья" />
                     </columns>
                   </TableView>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="deleteBtn" disable="true" layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#deleteBtn" prefHeight="26.0" prefWidth="94.0" text="Удалить" />
+                        <Button fx:id="deleteBtn" layoutX="25.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#deleteBtn" prefHeight="26.0" prefWidth="94.0" text="Удалить" />
                      </children>
                   </AnchorPane>
                </children>
@@ -64,9 +64,10 @@
                                     <TableView fx:id="gemTable" prefHeight="261.0" prefWidth="378.0">
                                       <columns>
                                         <TableColumn fx:id="idColumn" prefWidth="44.8000470995903" text="id" />
-                                        <TableColumn fx:id="weightColumn" prefWidth="96.0" text="Вес, карат" />
-                                          <TableColumn fx:id="priceColumn" prefWidth="109.60005187988281" text="Цена, руб" />
-                                          <TableColumn fx:id="clarityColumn" prefWidth="135.99998474121094" text="Прозрачность, %" />
+                                        <TableColumn fx:id="weightColumn" prefWidth="65.59996795654297" text="Вес, карат" />
+                                          <TableColumn fx:id="priceColumn" prefWidth="72.80005645751953" text="Цена, руб" />
+                                          <TableColumn fx:id="clarityColumn" prefWidth="111.19998168945312" text="Прозрачность, %" />
+                                          <TableColumn fx:id="quentityColumn" prefWidth="81.59995117187498" text="Кол-во" />
                                       </columns>
                                     </TableView>
                                  </children>
@@ -102,6 +103,7 @@
                            <children>
                               <Text layoutX="251.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Стоимость: " />
                               <Text fx:id="totalCostTxt" layoutX="323.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0руб" />
+                              <Button fx:id="refreshBtn" layoutX="136.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#refreshBtn" text="Сброс фильтров" />
                            </children>
                         </AnchorPane>
                      </children>
@@ -125,6 +127,11 @@
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
                         <Text fx:id="noJewelryText" fill="RED" layoutX="17.0" layoutY="22.0" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Невозможно создать ожерелье с таким весом" textAlignment="CENTER" wrappingWidth="125.59995117187486">
+                           <font>
+                              <Font name="System Italic" size="14.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="emptyField" fill="RED" layoutX="26.0" layoutY="19.0" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Поле пустое" textAlignment="CENTER" wrappingWidth="107.19999999999993">
                            <font>
                               <Font name="System Italic" size="14.0" />
                            </font>

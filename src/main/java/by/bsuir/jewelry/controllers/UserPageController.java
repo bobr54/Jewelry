@@ -2,7 +2,20 @@ package by.bsuir.jewelry.controllers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import by.bsuir.jewelry.models.Gem;
+import by.bsuir.jewelry.models.Necklace;
+import by.bsuir.jewelry.models.User;
+import by.bsuir.jewelry.services.GemService;
+import by.bsuir.jewelry.services.NecklaceService;
+import by.bsuir.jewelry.services.UserService;
+import by.bsuir.jewelry.tableView.GemModel;
+import by.bsuir.jewelry.tableView.GemUserModel;
+import by.bsuir.jewelry.tableView.NecklaceModel;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,17 +30,31 @@ import javafx.stage.Stage;
 
 public class UserPageController {
 
+    private final UserService userService = new UserService();
+    private GemUserModel editGem;
+    private final GemService gemService = new GemService();
+    private final NecklaceService necklaceService = new NecklaceService();
+    private List<Gem> gems;
+    private ObservableList<GemUserModel> gemData;
+    private ObservableList<NecklaceModel> necklaceData;
+
+    private Necklace currNecklace;
+    private List<Necklace> necklaceList;
+    private Long userId;
+
+
+    private List<Gem> gemNecklace;
     @FXML
     private ResourceBundle resources;
+
+    @FXML
+    private Text emptyField;
 
     @FXML
     private URL location;
 
     @FXML
     private Button ascendingBtn;
-
-    @FXML
-    private TableColumn<?, ?> clarityColumn;
 
     @FXML
     private Button createBtn;
@@ -42,10 +69,11 @@ public class UserPageController {
     private Button filterBtn;
 
     @FXML
-    private TableView<?> gemTable;
+    private Button deleteBtn;
 
     @FXML
-    private TableColumn<?, ?> idColumn;
+    private TableView<GemUserModel> gemTable;
+
 
     @FXML
     private TextField maxFilterField;
@@ -54,13 +82,11 @@ public class UserPageController {
     private TextField minFilterField;
 
     @FXML
-    private TableView<?> myJewelryTable;
+    private TableView<NecklaceModel> myJewelryTable;
 
     @FXML
     private Text noJewelryText;
 
-    @FXML
-    private TableColumn<?, ?> priceColumn;
 
     @FXML
     private ChoiceBox<?> sortChoice;
@@ -69,11 +95,28 @@ public class UserPageController {
     private Text totalCostTxt;
 
     @FXML
-    private TableColumn<?, ?> weightColumn;
+    private TextField weightField;
+    @FXML
+    private TableColumn<GemUserModel, Long> idColumn;
 
     @FXML
-    private TextField weightField;
+    private TableColumn<GemUserModel, Double> priceColumn;
 
+    @FXML
+    private TableColumn<GemUserModel, Double> weightColumn;
+
+    @FXML
+    private TableColumn<GemUserModel, Double> clarityColumn;
+
+    @FXML
+    private TableColumn<GemUserModel, Integer> quentityColumn;
+
+    @FXML
+    private TableColumn<NecklaceModel, Long> idNecklaceColumn;
+
+    public void setId(Long id) {
+        this.userId = id;
+    }
     @FXML
     void ascendingBtn(MouseEvent event) {
 
@@ -81,7 +124,41 @@ public class UserPageController {
 
     @FXML
     void createBtn(MouseEvent event) {
+        String weightStr = weightField.getText();
+        if(weightStr.isEmpty())
+            emptyField.setOpacity(1);
+        else{
+            emptyField.setOpacity(0);
+            Map<Gem, Integer> map = getSubsetSum(Double.parseDouble(weightStr));
+            if(map.isEmpty()){
+                noJewelryText.setOpacity(1);
+            }
+            else {
+                noJewelryText.setOpacity(0);
+                User user = userService.getUserById(userId);
+                currNecklace = new Necklace(user, map);
+                necklaceService.addNecklace(currNecklace);
+                necklaceList.add(currNecklace);
+                NecklaceModel newNecklaceModel = new NecklaceModel(currNecklace);
+                necklaceData.add(newNecklaceModel);
+                myJewelryTable.setItems(necklaceData);
+                Map<Gem, Integer> gemQuantities = currNecklace.getGemQuantities();
+                gemNecklace = new ArrayList<>(gemQuantities.keySet());
+                Double price = 0.0;
+                List<GemUserModel> gemUserModels = new ArrayList<>();
+                for(Gem gem : gemNecklace){
+                    price += gem.getPrice();
+                    Integer quantity = gemQuantities.get(gem);
+                    GemUserModel model = new GemUserModel(gem, quantity);
+                    gemUserModels.add(model);
+                }
 
+                gemData = FXCollections.observableArrayList();
+                gemData.addAll(gemUserModels);
+                gemTable.setItems(gemData);
+                totalCostTxt.setText(Double.toString(price) + "руб");
+            }
+        }
     }
 
     @FXML
@@ -99,29 +176,159 @@ public class UserPageController {
 
     @FXML
     void filterBtn(MouseEvent event) {
+        String minFilterStr = minFilterField.getText();
+        String maxFilterStr = maxFilterField.getText();
+        Double minFilter, maxFilter;
+        if(minFilterStr.isEmpty()){
+            minFilter = 0.0;
+            minFilterField.setText("0.0");
+        }else minFilter = Double.parseDouble(minFilterStr);
+        if(maxFilterStr.isEmpty()){
+            maxFilter = 100.0;
+            maxFilterField.setText("100.0");
+        }else maxFilter = Double.parseDouble(maxFilterStr);
+        ObservableList<GemUserModel> gemFilterData = FXCollections.observableArrayList();
+        Map<Gem, Integer> gemQuantities = currNecklace.getGemQuantities();
+        for(Gem gem : gems){
+            if(gem.getClarity()>=minFilter && gem.getClarity()<=maxFilter){
+                Integer quantity = gemQuantities.get(gem);
+                GemUserModel filterGemUserModel = new GemUserModel(gem, quantity);
+                gemFilterData.add(filterGemUserModel);
+            }
+        }
+        gemTable.getItems().clear();
+        if(gemFilterData.size()>0)
+            gemTable.setItems(gemFilterData);
 
+    }
+    @FXML
+    void initialize() {
+        gems = gemService.getAllGems();
+
+        idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
+        weightColumn.setCellValueFactory(cellData -> cellData.getValue().weightProperty().asObject());
+        priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
+        clarityColumn.setCellValueFactory(cellData -> cellData.getValue().clarityProperty().asObject());
+        necklaceList = necklaceService.getNecklaceByUser(userId);
+        List<NecklaceModel> necklaceModels = necklaceList.stream()
+                .map(NecklaceModel::new)
+                .collect(Collectors.toList());
+
+        necklaceData = FXCollections.observableArrayList();
+        necklaceData.addAll(necklaceModels);
+        myJewelryTable.setItems(necklaceData);
+
+        myJewelryTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 1) {
+                NecklaceModel selectedItem = myJewelryTable.getSelectionModel().getSelectedItem();
+
+                if (selectedItem != null) {
+
+                    Long id = selectedItem.getId();
+                    for (Necklace necklace : necklaceList) {
+                        deleteBtn.setDisable(false);
+                        if (necklace.getId().equals(id)) {
+                            currNecklace = necklace;
+                            Map<Gem, Integer> gemQuantities = currNecklace.getGemQuantities();
+                            gemNecklace = new ArrayList<>(gemQuantities.keySet());
+                            Double price = 0.0;
+                            List<GemUserModel> gemUserModels = new ArrayList<>();
+                            for(Gem gem : gemNecklace){
+                                price += gem.getPrice();
+                                Integer quantity = gemQuantities.get(gem);
+                                GemUserModel model = new GemUserModel(gem, quantity);
+                                gemUserModels.add(model);
+                            }
+
+                            gemData = FXCollections.observableArrayList();
+                            gemData.addAll(gemUserModels);
+                            gemTable.setItems(gemData);
+                            totalCostTxt.setText(Double.toString(price) + "руб");
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+        myJewelryTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 1) {
+                // Получаем выбранную строку таблицы
+                NecklaceModel selectedItem = myJewelryTable.getSelectionModel().getSelectedItem();
+
+                // Проверяем, является ли выбранная строка непустой
+                if (selectedItem != null) {
+                    decendingBtn.setDisable(false);
+                }
+            }
+        });
+    }
+
+    public Map<Gem, Integer> getSubsetSum(double sum) {
+        int n = gems.size();
+        boolean[][] dp = new boolean[n + 1][(int) (sum + 1)];
+
+        // Инициализация первого столбца
+        for (int i = 0; i <= n; i++) {
+            dp[i][0] = true;
+        }
+
+        // Заполнение массива dp
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= sum; j++) {
+                if (gems.get(i - 1).getWeight() <= j) {
+                    dp[i][j] = dp[i - 1][j] || dp[i - 1][(int) (j - gems.get(i - 1).getWeight())];
+                } else {
+                    dp[i][j] = dp[i - 1][j];
+                }
+            }
+        }
+
+        // Построение Map с числами и их количеством
+        Map<Gem, Integer> subsetMap = new HashMap<>();
+        int i = n;
+        double j = sum;
+        while (i > 0 && j > 0) {
+            if (dp[i][(int) j] && !dp[i - 1][(int) j]) {
+                Gem gem = gems.get(i - 1);
+                subsetMap.put(gem, subsetMap.getOrDefault(gem, 0) + 1);
+                j -= gems.get(i - 1).getWeight();
+            }
+            i--;
+        }
+
+        return subsetMap;
     }
 
     @FXML
-    void initialize() {
-        assert ascendingBtn != null : "fx:id=\"ascendingBtn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert clarityColumn != null : "fx:id=\"clarityColumn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert createBtn != null : "fx:id=\"createBtn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert decendingBtn != null : "fx:id=\"decendingBtn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert exitBtn != null : "fx:id=\"exitBtn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert filterBtn != null : "fx:id=\"filterBtn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert gemTable != null : "fx:id=\"gemTable\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert idColumn != null : "fx:id=\"idColumn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert maxFilterField != null : "fx:id=\"maxFilterField\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert minFilterField != null : "fx:id=\"minFilterField\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert myJewelryTable != null : "fx:id=\"myJewelryTable\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert noJewelryText != null : "fx:id=\"noJewelryText\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert priceColumn != null : "fx:id=\"priceColumn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert sortChoice != null : "fx:id=\"sortChoice\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert totalCostTxt != null : "fx:id=\"totalCostTxt\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert weightColumn != null : "fx:id=\"weightColumn\" was not injected: check your FXML file 'userPage-view.fxml'.";
-        assert weightField != null : "fx:id=\"weightField\" was not injected: check your FXML file 'userPage-view.fxml'.";
-
+    public void refreshBtn(MouseEvent mouseEvent) {
+        if(currNecklace != null) {
+            gemTable.getItems().clear();
+            Map<Gem, Integer> gemQuantities = currNecklace.getGemQuantities();
+            gemNecklace = new ArrayList<>(gemQuantities.keySet());
+            Double price = 0.0;
+            List<GemUserModel> gemUserModels = new ArrayList<>();
+            for (Gem gem : gemNecklace) {
+                price += gem.getPrice();
+                Integer quantity = gemQuantities.get(gem);
+                GemUserModel model = new GemUserModel(gem, quantity);
+                gemUserModels.add(model);
+            }
+            gemData.addAll(gemUserModels);
+            gemTable.setItems(gemData);
+        }
     }
 
+    public void deleteBtn(MouseEvent mouseEvent) {
+        NecklaceModel selectedItem = myJewelryTable.getSelectionModel().getSelectedItem();
+
+//        if (selectedItem != null) {
+//            decendingBtn.setDisable(false);
+//            Long id = selectedItem.getId();
+//            necklaceService.deleteNecklace(id.intValue());
+//            necklaceData.remove(selectedItem);
+//
+//            Gem selectedGem = new Gem(id, weight, price, clarity);
+//            gems.remove(selectedGem);
+//        }
+    }
 }

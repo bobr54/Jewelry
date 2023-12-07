@@ -27,4 +27,9 @@ public class Necklace {
     @MapKeyJoinColumn(name = "gem_id")
     @Column(name = "quantity")
     private Map<Gem, Integer> gemQuantities = new HashMap<>();
+
+    public Necklace(User user, Map<Gem, Integer> gemQuantities) {
+        this.user = user;
+        this.gemQuantities = gemQuantities;
+    }
 }
