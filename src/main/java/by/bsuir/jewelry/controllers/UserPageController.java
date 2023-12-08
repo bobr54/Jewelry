@@ -53,14 +53,10 @@ public class UserPageController {
     @FXML
     private URL location;
 
-    @FXML
-    private Button ascendingBtn;
 
     @FXML
     private Button createBtn;
 
-    @FXML
-    private Button decendingBtn;
 
     @FXML
     private Button exitBtn;
@@ -86,10 +82,6 @@ public class UserPageController {
 
     @FXML
     private Text noJewelryText;
-
-
-    @FXML
-    private ChoiceBox<?> sortChoice;
 
     @FXML
     private Text totalCostTxt;
@@ -117,10 +109,7 @@ public class UserPageController {
     public void setId(Long id) {
         this.userId = id;
     }
-    @FXML
-    void ascendingBtn(MouseEvent event) {
 
-    }
 
     @FXML
     void createBtn(MouseEvent event) {
@@ -129,8 +118,8 @@ public class UserPageController {
             emptyField.setOpacity(1);
         else{
             emptyField.setOpacity(0);
-            Map<Gem, Integer> map = getSubsetSum(Double.parseDouble(weightStr));
-            if(map.isEmpty()){
+            Map<Gem, Integer> map = checkGem(Double.parseDouble(weightStr));
+            if(map == null){
                 noJewelryText.setOpacity(1);
             }
             else {
@@ -147,8 +136,8 @@ public class UserPageController {
                 Double price = 0.0;
                 List<GemUserModel> gemUserModels = new ArrayList<>();
                 for(Gem gem : gemNecklace){
-                    price += gem.getPrice();
                     Integer quantity = gemQuantities.get(gem);
+                    price += gem.getPrice() * quantity;
                     GemUserModel model = new GemUserModel(gem, quantity);
                     gemUserModels.add(model);
                 }
@@ -156,15 +145,12 @@ public class UserPageController {
                 gemData = FXCollections.observableArrayList();
                 gemData.addAll(gemUserModels);
                 gemTable.setItems(gemData);
+                quentityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
                 totalCostTxt.setText(Double.toString(price) + "руб");
             }
         }
     }
 
-    @FXML
-    void decendingBtn(MouseEvent event) {
-
-    }
 
     @FXML
     void exitBtn(MouseEvent event) throws IOException {
@@ -189,17 +175,53 @@ public class UserPageController {
         }else maxFilter = Double.parseDouble(maxFilterStr);
         ObservableList<GemUserModel> gemFilterData = FXCollections.observableArrayList();
         Map<Gem, Integer> gemQuantities = currNecklace.getGemQuantities();
-        for(Gem gem : gems){
+        gemNecklace = new ArrayList<>(gemQuantities.keySet());
+        Double price = 0.0;
+        for(Gem gem : gemNecklace){
             if(gem.getClarity()>=minFilter && gem.getClarity()<=maxFilter){
                 Integer quantity = gemQuantities.get(gem);
                 GemUserModel filterGemUserModel = new GemUserModel(gem, quantity);
+                price += gem.getPrice() * quantity;
                 gemFilterData.add(filterGemUserModel);
             }
         }
+        totalCostTxt.setText(Double.toString(price) + "руб");
         gemTable.getItems().clear();
         if(gemFilterData.size()>0)
             gemTable.setItems(gemFilterData);
 
+    }
+
+    @FXML
+    void necklaceTable(MouseEvent event) {
+        NecklaceModel selectedItem = myJewelryTable.getSelectionModel().getSelectedItem();
+
+        if (selectedItem != null) {
+
+            Long id = selectedItem.getId();
+            for (Necklace necklace : necklaceList) {
+                deleteBtn.setDisable(false);
+                if (necklace.getId().equals(id)) {
+                    currNecklace = necklace;
+                    Map<Gem, Integer> gemQuantities = currNecklace.getGemQuantities();
+                    gemNecklace = new ArrayList<>(gemQuantities.keySet());
+                    Double price = 0.0;
+                    List<GemUserModel> gemUserModels = new ArrayList<>();
+                    for(Gem gem : gemNecklace){
+                        Integer quantity = gemQuantities.get(gem);
+                        GemUserModel model = new GemUserModel(gem, quantity);
+                        price += gem.getPrice() * quantity;
+                        gemUserModels.add(model);
+                    }
+
+                    gemData = FXCollections.observableArrayList();
+                    gemData.addAll(gemUserModels);
+                    gemTable.setItems(gemData);
+                    totalCostTxt.setText(Double.toString(price) + "руб");
+                    break;
+                }
+            }
+        }
     }
     @FXML
     void initialize() {
@@ -217,13 +239,13 @@ public class UserPageController {
         necklaceData = FXCollections.observableArrayList();
         necklaceData.addAll(necklaceModels);
         myJewelryTable.setItems(necklaceData);
-
+        idNecklaceColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         myJewelryTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 1) {
                 NecklaceModel selectedItem = myJewelryTable.getSelectionModel().getSelectedItem();
 
                 if (selectedItem != null) {
-
+                    deleteBtn.setDisable(false);
                     Long id = selectedItem.getId();
                     for (Necklace necklace : necklaceList) {
                         deleteBtn.setDisable(false);
@@ -234,15 +256,18 @@ public class UserPageController {
                             Double price = 0.0;
                             List<GemUserModel> gemUserModels = new ArrayList<>();
                             for(Gem gem : gemNecklace){
-                                price += gem.getPrice();
                                 Integer quantity = gemQuantities.get(gem);
                                 GemUserModel model = new GemUserModel(gem, quantity);
+                                price += gem.getPrice() * quantity;
+
                                 gemUserModels.add(model);
                             }
 
                             gemData = FXCollections.observableArrayList();
                             gemData.addAll(gemUserModels);
                             gemTable.setItems(gemData);
+                            quentityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+
                             totalCostTxt.setText(Double.toString(price) + "руб");
                             break;
                         }
@@ -250,55 +275,48 @@ public class UserPageController {
                 }
             }
         });
-        myJewelryTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 1) {
-                // Получаем выбранную строку таблицы
-                NecklaceModel selectedItem = myJewelryTable.getSelectionModel().getSelectedItem();
-
-                // Проверяем, является ли выбранная строка непустой
-                if (selectedItem != null) {
-                    decendingBtn.setDisable(false);
-                }
-            }
-        });
     }
 
-    public Map<Gem, Integer> getSubsetSum(double sum) {
-        int n = gems.size();
-        boolean[][] dp = new boolean[n + 1][(int) (sum + 1)];
-
-        // Инициализация первого столбца
-        for (int i = 0; i <= n; i++) {
-            dp[i][0] = true;
-        }
-
-        // Заполнение массива dp
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= sum; j++) {
-                if (gems.get(i - 1).getWeight() <= j) {
-                    dp[i][j] = dp[i - 1][j] || dp[i - 1][(int) (j - gems.get(i - 1).getWeight())];
-                } else {
-                    dp[i][j] = dp[i - 1][j];
+    private Map<Gem, Integer> checkGem( double res) {
+        Map<Gem, Integer> result = new HashMap<>();
+        if (isSumPossible(res, 0, result)) {
+            Iterator<Map.Entry<Gem, Integer>> iterator = result.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Gem, Integer> entry = iterator.next();
+                if (entry.getValue() == 0) {
+                    iterator.remove();
                 }
             }
+            return result;
+        } else {
+            return null;
         }
-
-        // Построение Map с числами и их количеством
-        Map<Gem, Integer> subsetMap = new HashMap<>();
-        int i = n;
-        double j = sum;
-        while (i > 0 && j > 0) {
-            if (dp[i][(int) j] && !dp[i - 1][(int) j]) {
-                Gem gem = gems.get(i - 1);
-                subsetMap.put(gem, subsetMap.getOrDefault(gem, 0) + 1);
-                j -= gems.get(i - 1).getWeight();
-            }
-            i--;
-        }
-
-        return subsetMap;
     }
 
+    private boolean isSumPossible(double target, int index, Map<Gem, Integer> result) {
+        if (target == 0) {
+            return true;
+        }
+
+        if (index >= gems.size()) {
+            return false;
+        }
+
+        double current = gems.get(index).getWeight();
+
+        for (int count = 0; count * current <= target; count++) {
+            double remaining = target - count * current;
+            result.put(gems.get(index), count);
+
+            if (isSumPossible(remaining, index + 1, result)) {
+                return true;
+            }
+
+            result.remove(current);
+        }
+
+        return false;
+    }
     @FXML
     public void refreshBtn(MouseEvent mouseEvent) {
         if(currNecklace != null) {
@@ -308,27 +326,38 @@ public class UserPageController {
             Double price = 0.0;
             List<GemUserModel> gemUserModels = new ArrayList<>();
             for (Gem gem : gemNecklace) {
-                price += gem.getPrice();
                 Integer quantity = gemQuantities.get(gem);
                 GemUserModel model = new GemUserModel(gem, quantity);
+                price += gem.getPrice() * quantity;
+
                 gemUserModels.add(model);
             }
             gemData.addAll(gemUserModels);
             gemTable.setItems(gemData);
+            totalCostTxt.setText(Double.toString(price) + "руб");
         }
     }
 
     public void deleteBtn(MouseEvent mouseEvent) {
         NecklaceModel selectedItem = myJewelryTable.getSelectionModel().getSelectedItem();
 
-//        if (selectedItem != null) {
-//            decendingBtn.setDisable(false);
-//            Long id = selectedItem.getId();
+        if (selectedItem != null) {
+            deleteBtn.setDisable(false);
+            Long id = selectedItem.getId();
+            deleteNecklace(id);
 //            necklaceService.deleteNecklace(id.intValue());
-//            necklaceData.remove(selectedItem);
-//
-//            Gem selectedGem = new Gem(id, weight, price, clarity);
-//            gems.remove(selectedGem);
-//        }
+            necklaceData.remove(selectedItem);
+        }
+    }
+
+    private void deleteNecklace(Long id){
+        Necklace deleteNecklace = null;
+        for (Necklace necklace : necklaceList) {
+            if (necklace.getId().equals(id)) {
+                deleteNecklace = necklace;
+                break;
+            }
+        }
+        necklaceService.deleteNecklace(deleteNecklace);
     }
 }

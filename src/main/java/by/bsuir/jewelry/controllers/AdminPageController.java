@@ -26,16 +26,10 @@ public class AdminPageController {
     private List<Gem> gems;
 
     private ObservableList<GemModel> gemData;
-    @FXML
-    private Button ascendingBtn;
-
-
 
     @FXML
     private TextField clarityField;
 
-    @FXML
-    private Button decendingBtn;
 
     @FXML
     private Button editBtn;
@@ -89,21 +83,7 @@ public class AdminPageController {
     private TextField priceField;
 
     @FXML
-    private ChoiceBox<?> sortChoice;
-
-
-    @FXML
     private TextField weightField;
-
-    @FXML
-    void ascendingBtn(MouseEvent event) {
-
-    }
-
-    @FXML
-    void decendingBtn(MouseEvent event) {
-
-    }
 
     @FXML
     void exitBtn(MouseEvent event) throws IOException {

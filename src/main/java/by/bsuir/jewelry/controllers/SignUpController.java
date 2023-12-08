@@ -85,15 +85,25 @@ public class SignUpController {
                 }
                 else{
                     FXMLLoader loader;
-                    if(role.equals("user"))
+                    if(role.equals("user")) {
                         loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/userPage-view.fxml"));
-                    else
+                        Stage primaryStage = (Stage) regBtn.getScene().getWindow();
+                        UserPageController controller = new UserPageController();
+                        controller.setId(id);
+
+                        loader.setController(controller);
+
+                        Scene scene = new Scene(loader.load(), 700, 500);
+                        primaryStage.setScene(scene);
+                        primaryStage.show();
+                    }
+                    else {
                         loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/adminPage-view.fxml"));
-                    Stage primaryStage = (Stage) regBtn.getScene().getWindow();
-                    primaryStage.setScene(new Scene(loader.load(), 700, 500));
-                    UserPageController controller = loader.getController();
-                    controller.setId(id);
-                    primaryStage.show();
+                        Stage primaryStage = (Stage) regBtn.getScene().getWindow();
+                        primaryStage.setScene(new Scene(loader.load(), 700, 500));
+                        primaryStage.show();
+                    }
+
 
                 }
             } catch (SQLException e) {

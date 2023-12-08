@@ -63,10 +63,15 @@ public class LoginController {
                 }
                 else {
                     loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/userPage-view.fxml"));
+
                     Stage primaryStage = (Stage) regBtn.getScene().getWindow();
-                    primaryStage.setScene(new Scene(loader.load(), 700, 500));
-                    UserPageController controller = loader.getController();
+                    UserPageController controller = new UserPageController();
                     controller.setId(authResult.getUserId());
+
+                    loader.setController(controller);
+
+                    Scene scene = new Scene(loader.load(), 700, 500);
+                    primaryStage.setScene(scene);
                     primaryStage.show();
                 }
 

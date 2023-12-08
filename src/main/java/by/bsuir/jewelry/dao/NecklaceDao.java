@@ -6,6 +6,7 @@ import by.bsuir.jewelry.models.User;
 import by.bsuir.jewelry.util.EntityManager;
 import by.bsuir.jewelry.util.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -34,5 +35,21 @@ public class NecklaceDao {
 
     public List<Necklace> getAllNecklace() {
         return (List<Necklace>) HibernateUtil.getSessionFactory().openSession().createQuery("From Necklace").list();
+    }
+
+    public void deleteNecklace(Necklace deleteNecklace) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+
+            session.createNativeQuery("DELETE FROM necklace_gems WHERE necklace_id = :necklaceId")
+                    .setParameter("necklaceId", deleteNecklace.getId())
+                    .executeUpdate();
+
+            EntityManager.deleteEntity(deleteNecklace.getId().intValue(), Necklace.class);
+
+            tx.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -23,4 +23,8 @@ public class NecklaceService {
     public  List<Necklace> getAllNecklace(){
         return necklaceDao.getAllNecklace();
     }
+
+    public void deleteNecklace(Necklace deleteNecklace){
+        necklaceDao.deleteNecklace(deleteNecklace);
+    }
 }

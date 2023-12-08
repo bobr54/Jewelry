@@ -22,10 +22,10 @@ public class Necklace {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "necklace_gems", joinColumns = @JoinColumn(name = "necklace_id"))
     @MapKeyJoinColumn(name = "gem_id")
-    @Column(name = "quantity")
+    @Column(name = "quantity" )
     private Map<Gem, Integer> gemQuantities = new HashMap<>();
 
     public Necklace(User user, Map<Gem, Integer> gemQuantities) {
