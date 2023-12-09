@@ -2,6 +2,8 @@ package by.bsuir.jewelry.controllers;
 
 import by.bsuir.jewelry.auth.AuthResult;
 import by.bsuir.jewelry.auth.Authorisation;
+import by.bsuir.jewelry.exceptions.NoContentFieldException;
+import by.bsuir.jewelry.exceptions.UncorrectDataException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -44,24 +46,25 @@ public class LoginController {
 
     @FXML
     void loginBtn(MouseEvent event) throws IOException {
-        String loginStr = loginField.getText();
-        String passwordStr = passwordField.getText();
-        boolean isFieldsEmpty = loginStr.isEmpty()||passwordStr.isEmpty();
-        if (isFieldsEmpty) {
-            dataDangerTxt.setOpacity(0);
-            fieldDangerTxt.setOpacity(1);
-        }
-        AuthResult authResult = Authorisation.authenticateUser(loginStr, passwordStr);
-        if (authResult.isAuthenticated()) {
+        try {
+            String loginStr = loginField.getText();
+            String passwordStr = passwordField.getText();
+            boolean isFieldsEmpty = loginStr.isEmpty() || passwordStr.isEmpty();
+            if (isFieldsEmpty) {
+                throw new NoContentFieldException("Ошибка: Поля пустые " , fieldDangerTxt, dataDangerTxt);
+            }
+            AuthResult authResult = Authorisation.authenticateUser(loginStr, passwordStr);
+            if (!authResult.isAuthenticated()) {
+                    throw new UncorrectDataException("Неверный логин или пароль : " + loginStr + "  " + passwordStr);
+                }
             try {
                 FXMLLoader loader;
-                if(authResult.getRole().equals("admin")) {
+                if (authResult.getRole().equals("admin")) {
                     loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/adminPage-view.fxml"));
                     Stage primaryStage = (Stage) regBtn.getScene().getWindow();
                     primaryStage.setScene(new Scene(loader.load(), 700, 500));
                     primaryStage.show();
-                }
-                else {
+                } else {
                     loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/userPage-view.fxml"));
 
                     Stage primaryStage = (Stage) regBtn.getScene().getWindow();
@@ -75,14 +78,17 @@ public class LoginController {
                     primaryStage.show();
                 }
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-
-        } else {
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+        }
+        catch (UncorrectDataException e){
+            System.out.println("Ошибка: " + e.getMessage());
             dataDangerTxt.setOpacity(1);
             fieldDangerTxt.setOpacity(0);
+        }
+        catch (NoContentFieldException e){
+
         }
         loginField.setText("");
         passwordField.setText("");

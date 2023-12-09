@@ -1,7 +1,7 @@
 package by.bsuir.jewelry.controllers;
 
 import by.bsuir.jewelry.auth.Authorisation;
-import by.bsuir.jewelry.models.User;
+import by.bsuir.jewelry.exceptions.RegisterException;
 import by.bsuir.jewelry.services.UserService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -62,60 +62,61 @@ public class SignUpController {
         boolean isUserExc = false;
         boolean isFieldsEmpty = loginStr.isEmpty()||passwordStr.isEmpty()||repeatPassword.isEmpty();
         boolean isPasswordsMatch = passwordStr.equals(repeatPassword);
-        if (isFieldsEmpty) {
-            passwordDangerTxt.setOpacity(0);
-            fieldDangerTxt.setOpacity(1);
-            loginDangerTxt.setOpacity(0);
-        } else if (!isPasswordsMatch) {
-            passwordDangerTxt.setOpacity(0);
-            fieldDangerTxt.setOpacity(1);
-            loginDangerTxt.setOpacity(0);
-        } else {
+        try {
+            if (isFieldsEmpty) {
+                passwordDangerTxt.setOpacity(0);
+                fieldDangerTxt.setOpacity(1);
+                loginDangerTxt.setOpacity(0);
+            } else if (!isPasswordsMatch) {
+                throw new RegisterException("Пароли не совпадают");
+            } else {
+                    String role = userService.getRegistrationRole();
+                    isUserExc = Authorisation.registerUser(loginStr, passwordStr, role);
+                    Long id = userService.getUserByLogin(loginStr).getId();
+                    if (!isUserExc) {
+                        passwordDangerTxt.setOpacity(0);
+                        fieldDangerTxt.setOpacity(0);
+                        loginDangerTxt.setOpacity(1);
+                    } else {
+                        passwordDangerTxt.setOpacity(0);
+                        fieldDangerTxt.setOpacity(0);
+                        loginDangerTxt.setOpacity(0);
+                        FXMLLoader loader;
+                        if (role.equals("user")) {
+                            loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/userPage-view.fxml"));
+                            Stage primaryStage = (Stage) regBtn.getScene().getWindow();
+                            UserPageController controller = new UserPageController();
+                            controller.setId(id);
+
+                            loader.setController(controller);
+
+                            Scene scene = new Scene(loader.load(), 700, 500);
+                            primaryStage.setScene(scene);
+                            primaryStage.show();
+                        } else {
+                            loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/adminPage-view.fxml"));
+                            Stage primaryStage = (Stage) regBtn.getScene().getWindow();
+                            primaryStage.setScene(new Scene(loader.load(), 700, 500));
+                            primaryStage.show();
+                        }
+
+
+                    }
+            }
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RegisterException e){
+            System.out.println(e.getMessage());
             passwordDangerTxt.setOpacity(0);
             fieldDangerTxt.setOpacity(0);
-            loginDangerTxt.setOpacity(0);
-            try {
-                String role = userService.getRegistrationRole();
-                isUserExc = Authorisation.registerUser(loginStr, passwordStr, role);
-                Long id = userService.getUserByLogin(loginStr).getId();
-                if (!isUserExc) {
-                    passwordDangerTxt.setOpacity(0);
-                    fieldDangerTxt.setOpacity(0);
-                    loginDangerTxt.setOpacity(1);
-                }
-                else{
-                    FXMLLoader loader;
-                    if(role.equals("user")) {
-                        loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/userPage-view.fxml"));
-                        Stage primaryStage = (Stage) regBtn.getScene().getWindow();
-                        UserPageController controller = new UserPageController();
-                        controller.setId(id);
-
-                        loader.setController(controller);
-
-                        Scene scene = new Scene(loader.load(), 700, 500);
-                        primaryStage.setScene(scene);
-                        primaryStage.show();
-                    }
-                    else {
-                        loader = new FXMLLoader(getClass().getResource("/by/bsuir/jewelry/views/adminPage-view.fxml"));
-                        Stage primaryStage = (Stage) regBtn.getScene().getWindow();
-                        primaryStage.setScene(new Scene(loader.load(), 700, 500));
-                        primaryStage.show();
-                    }
-
-
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            loginField.setText("");
-            passwordField.setText("");
-            repeatPasswordField.setText("");
+            loginDangerTxt.setOpacity(1);
         }
+
+        loginField.setText("");
+        passwordField.setText("");
+        repeatPasswordField.setText("");
     }
 
 }

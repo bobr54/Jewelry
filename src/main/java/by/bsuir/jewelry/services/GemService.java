@@ -8,26 +8,61 @@ import java.util.List;
 
 public class GemService {
 
+    /**
+     * The GemDao instance for interacting with gem data in the database.
+     */
     private final GemDao gemDao;
 
+    /**
+     * Constructs a GemService instance and initializes the GemDao.
+     */
     public GemService() {
         this.gemDao = new GemDao();
     }
 
-    public List<Gem> getAllGems(){
+    /**
+     * Retrieves a list of all gems from the database using the GemDao.
+     *
+     * @return A list of Gem objects representing all gems in the database.
+     */
+    public List<Gem> getAllGems() {
         return gemDao.getAllGems();
     }
 
+    /**
+     * Adds a new gem to the database using the GemDao.
+     *
+     * @param gem The Gem object representing the new gem to be added.
+     */
     public void addGem(Gem gem) {
         gemDao.addGem(gem);
     }
-    public Gem getGemById(int id){
+
+    /**
+     * Retrieves a specific gem from the database based on its ID using the GemDao.
+     *
+     * @param id The ID of the gem to be retrieved.
+     * @return The Gem object representing the gem with the provided ID.
+     */
+    public Gem getGemById(int id) {
         return gemDao.findGemById(id);
     }
-    public void updateGem(Gem newGem){
+
+    /**
+     * Updates an existing gem in the database using the GemDao.
+     *
+     * @param newGem The Gem object representing the updated gem information.
+     */
+    public void updateGem(Gem newGem) {
         gemDao.updateGem(newGem);
     }
-    public void deleteGem(int id){
+
+    /**
+     * Deletes a gem from the database based on its ID using the GemDao.
+     *
+     * @param id The ID of the gem to be deleted.
+     */
+    public void deleteGem(int id) {
         gemDao.deleteGem(id);
     }
 }
